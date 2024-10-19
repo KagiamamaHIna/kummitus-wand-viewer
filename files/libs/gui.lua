@@ -506,6 +506,14 @@ function UI.MoveImagePicker(id, x, y, mx, my, Content, image, StatusCustomText, 
                 if CTRL then
                     GuiColorSetForNextWidget(this.public.gui, 0.5, 0.5, 0.5, 1.0)
                     GuiText(this.public.gui, 0, 0, GameTextGetTranslatedOrNot("$kummitus_wand_viewer_picker_desc"))
+					if id == "MainButtonKummitus" then
+						GuiColorSetForNextWidget(this.public.gui, 0.5, 0.5, 0.5, 1.0)
+						GuiZSetForNextWidget(this.public.gui, this.private.ZDeep-1000)
+                        GuiText(this.public.gui, 0, 2, ModLink)
+						GuiColorSetForNextWidget(this.public.gui, 0.5, 0.5, 0.5, 1.0)
+						GuiZSetForNextWidget(this.public.gui, this.private.ZDeep-1000)
+						GuiText(this.public.gui, 0, 0, GameTextGet("$kummitus_wand_viewer_about_copy_link_tips"))
+					end
                 else
                     GuiColorSetForNextWidget(this.public.gui, 0.5, 0.5, 0.5, 1.0)
                     GuiText(this.public.gui, 0, 0, GameTextGetTranslatedOrNot("$kummitus_wand_viewer_picker_more"))
