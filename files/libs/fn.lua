@@ -1,5 +1,6 @@
 dofile_once("mods/kummitus_wand_viewer/files/libs/fp.lua")
 dofile_once("mods/kummitus_wand_viewer/files/libs/define.lua")
+local Nxml = dofile_once("mods/kummitus_wand_viewer/files/libs/nxml.lua")
 local noita_print = print
 local fastConcatStr = function (...)
 	return table.concat({...})
