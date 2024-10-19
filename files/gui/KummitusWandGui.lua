@@ -12,7 +12,8 @@ local RowGap = 23
 local ColGap = 23
 local SlotBG = "data/ui_gfx/inventory/full_inventory_box.png"
 local HLSlotBG = "data/ui_gfx/inventory/full_inventory_box_highlight.png"
-local function DrawWandSlot(id, k, wand)
+local function DrawWandSlot(id, k, KData)
+	local wand = KData[1]
 	local world_entity_id = GameGetWorldStateEntity()
     local comp_worldstate = EntityGetFirstComponent(world_entity_id, "WorldStateComponent")
     local inf_spells_enable = ComponentGetValue2(comp_worldstate, "perk_infinite_spells")
@@ -77,6 +78,7 @@ local function DrawWandSlot(id, k, wand)
                 NewLine("$inventory_capacity", wand.deck_capacity)
                 NewLine("$inventory_spread", wand.spread_degrees .. GameTextGet("$kummitus_wand_viewer_deg"))
                 NewLine("$kummitus_wand_viewer_speed_multiplier", "x" .. string.format("%.8f", wand.speed_multiplier))
+				NewLine("$kummitus_wand_viewer_path", KData[2])
             else
                 GuiLayoutBeginHorizontal(UI.gui, 0, 0, true)
                 for i = 1, #wand.spells.always do
@@ -186,7 +188,7 @@ function DarwWandContainer()
 			if held == nil then
 				return
 			end
-			InitWand(KummitusWands[k], held)
+			InitWand(KummitusWands[k][1], held)
 			UI.OnceCallOnExecute(function()
 				RefreshHeldWands()
 			end)
@@ -206,7 +208,7 @@ function DarwWandContainer()
             end
 
 			local k = UI.UserData["WandDepotKHighlight"] + 1
-			InitWand(KummitusWands[k], nil, Compose(EntityGetTransform, GetPlayer)())
+			InitWand(KummitusWands[k][1], nil, Compose(EntityGetTransform, GetPlayer)())
 		end
 	end
 	GuiZSetForNextWidget(UI.gui, UI.GetZDeep())
