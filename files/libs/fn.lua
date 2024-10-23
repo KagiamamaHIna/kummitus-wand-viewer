@@ -852,7 +852,8 @@ function InitWand(wandData, wand, x, y)
                 local spellid = L_ComponentGetValue2(ItemActionComp, "action_id")
 				local action = Always[i]
                 if _spellData == nil or _spellData[spellid] and (_spellData[spellid].custom_xml_file or _spellData[spell.id].custom_xml_file) then
-                    EntityKill(action)
+                    EntityRemoveFromParent(action)
+					EntityKill(action)
                     action = CreateItemActionEntity(spell.id)
                     EntityAddChild(wand, action)
 					actionItem = EntityGetFirstComponentIncludingDisabled(action, "ItemComponent")--重设置
@@ -891,6 +892,7 @@ function InitWand(wandData, wand, x, y)
                     local ItemActionComp = EntityGetFirstComponentIncludingDisabled(action, "ItemActionComponent")
                     local spellid = L_ComponentGetValue2(ItemActionComp, "action_id")
                     if _spellData == nil or _spellData[spellid] and (_spellData[spellid].custom_xml_file or _spellData[spell.id].custom_xml_file) then
+						EntityRemoveFromParent(action)
 						EntityKill(action)
                         action = CreateItemActionEntity(spell.id)
 						EntityAddChild(wand, action)
@@ -923,13 +925,16 @@ function InitWand(wandData, wand, x, y)
                     EntityAddChild(wand, action)
                 end
             elseif spell == "nil" and spells[i] then
+				EntityRemoveFromParent(spells[i])
                 EntityKill(spells[i])
             end
         end
         for i = #wandData.spells.spells + 1, EntityGetWandCapacity(wand) + #wandData.spells.always do --超出的法术需要杀死
+			EntityRemoveFromParent(spells[i])
             EntityKill(spells[i])
         end
         for i = #wandData.spells.always + 1, #Always do
+			EntityRemoveFromParent(Always[i])
             EntityKill(Always[i])
         end
 	end
