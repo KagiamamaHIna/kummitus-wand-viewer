@@ -211,8 +211,20 @@ local function DrawWandSlot(id, k, KData)
 end
 
 function DarwWandContainer()
+    if FunNumber == nil then
+        SetRandomSeed(GameGetFrameNum(),GameGetCameraPos())
+        FunNumber = Random(1,1000)
+    end
+
 	local WandDepotH = 135
-	local WandDepotW = 234
+    local WandDepotW = 234
+    if FunNumber == 220 then
+        UI.Image("serika", 20 + WandDepotW + 8, 60, "mods/kummitus_wand_viewer/files/gui/images/serika_kawaii.png", 1,
+        0.5 / UI.GetScale())
+        UI.BetterTooltips(function ()
+            UI.Text(0,0,"$kummitus_wand_viewer_serika")
+        end)
+    end
     UI.ScrollContainer("WandDepot", 20, 64, WandDepotW, WandDepotH, 2, 2)
     UI.AddAnywhereItem("WandDepot", function()
         for k, v in pairs(CurrentWands) do
