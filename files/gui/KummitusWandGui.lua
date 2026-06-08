@@ -1,7 +1,51 @@
 dofile_once("mods/kummitus_wand_viewer/files/libs/fn.lua")
+dofile_once("mods/kummitus_wand_viewer/files/libs/EntitySerialize.lua")
+local namelist = dofile_once("mods/kummitus_wand_viewer/files/libs/names.lua")
 local GetHeldWand = Compose(GetEntityHeldWand, GetPlayer)
 local function ClickSound()
     GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
+end
+
+local CurrentWands = KummitusWands
+local EditWands = DeepCopy(KummitusWands)
+local isEditMode = false
+
+local function SaveWand(click)
+    if not click then
+        return
+    end
+    ClickSound()
+    if #EditWands >= 50 then
+        return
+    end
+    local held = GetHeldWand()
+    if held == nil then
+        return
+    end
+
+    local path
+    local name
+    for _, v in ipairs(namelist) do
+        local newName = v .. ".xml"
+        local newPath = KummitusPath .. newName
+        if not Cpp.PathExists(newPath) then
+            path = newPath
+            name = newName
+            break
+        end
+    end
+    if DebugGetIsDevBuild() then
+        EntitySave(held, "debug/temp.xml")
+        Cpp.Rename("debug/temp.xml", path)
+    else
+        local result = EntitySerialize(held)
+        local wandfile = io.open(path, "w+")
+        wandfile:write(result)
+        wandfile:close()
+    end
+
+
+    EditWands[#EditWands + 1] = {GetWandData(held),"save00/persistent/bones_new/"..name}
 end
 
 local deg57_5 = math.rad(-57.5)
@@ -171,11 +215,28 @@ function DarwWandContainer()
 	local WandDepotW = 234
     UI.ScrollContainer("WandDepot", 20, 64, WandDepotW, WandDepotH, 2, 2)
     UI.AddAnywhereItem("WandDepot", function()
-        for k, v in pairs(KummitusWands) do
+        for k, v in pairs(CurrentWands) do
 			DrawWandSlot("KummitusWandsSlot",k,v)
 		end
 	end)
     UI.DrawScrollContainer("WandDepot", false) --绘制框内控件和框
+
+	local EditModeCB = function(left_click)
+		if left_click then
+			ClickSound()
+            UI.UserData["WandDepotKHighlight"] = nil
+            isEditMode = not isEditMode
+            CurrentWands = isEditMode and EditWands or KummitusWands
+		end
+	end
+
+    local EditIcon = isEditMode and "mods/kummitus_wand_viewer/files/gui/images/edit.png" or "mods/kummitus_wand_viewer/files/gui/images/edit_dark.png"
+    local EditHead = isEditMode and "$kummitus_wand_viewer_exit" or "$kummitus_wand_viewer_enter"
+    GuiZSetForNextWidget(UI.gui, UI.GetZDeep())
+	UI.MoveImageButton("KummitusEditMode", 0, 64,
+		EditIcon, nil, function()
+			GuiTooltip(UI.gui,GameTextGet(EditHead) .. GameTextGet("$kummitus_wand_viewer_edit"), "")
+        end, EditModeCB, false, true)
 
 	local RewriteWandCB = function(left_click)
 		if left_click then
@@ -188,7 +249,7 @@ function DarwWandContainer()
 			if held == nil then
 				return
 			end
-			InitWand(KummitusWands[k][1], held)
+			InitWand(CurrentWands[k][1], held)
 			UI.OnceCallOnExecute(function()
 				RefreshHeldWands()
 			end)
@@ -208,7 +269,7 @@ function DarwWandContainer()
             end
 
 			local k = UI.UserData["WandDepotKHighlight"] + 1
-			InitWand(KummitusWands[k][1], nil, Compose(EntityGetTransform, GetPlayer)())
+			InitWand(CurrentWands[k][1], nil, Compose(EntityGetTransform, GetPlayer)())
 		end
 	end
 	GuiZSetForNextWidget(UI.gui, UI.GetZDeep())
@@ -216,4 +277,33 @@ function DarwWandContainer()
 		"mods/kummitus_wand_viewer/files/gui/images/kummitus_loadwand.png", nil, function()
 			GuiTooltip(UI.gui, GameTextGet("$kummitus_wand_viewer_wand_depot_loadwand"), "")
         end, LoadWandCB, false, true)
+
+    if isEditMode then
+    	GuiZSetForNextWidget(UI.gui, UI.GetZDeep())
+	    UI.MoveImageButton("WandDepotSaveWand", 75, 64 + WandDepotH + 7,
+		"mods/kummitus_wand_viewer/files/gui/images/kummitus_save.png", nil, function()
+			GuiTooltip(UI.gui, GameTextGet("$kummitus_wand_viewer_wand_depot_save"), "")
+            end, SaveWand, false, true)
+        
+        local RemoveWandCB = function(left_click)
+            if not left_click then
+                return
+            end
+            ClickSound()
+            if UI.UserData["WandDepotKHighlight"] == nil then
+                return
+            end
+            local k = UI.UserData["WandDepotKHighlight"] + 1
+            local path = CurrentSavePath .. CurrentWands[k][2]
+            os.remove(path)
+            table.remove(CurrentWands, k)
+            UI.UserData["WandDepotKHighlight"] = nil
+        end
+        
+        GuiZSetForNextWidget(UI.gui, UI.GetZDeep())
+	    UI.MoveImageButton("WandDepotDelWand", 100, 64 + WandDepotH + 7,
+		"mods/kummitus_wand_viewer/files/gui/images/kummitus_delete.png", nil, function()
+			GuiTooltip(UI.gui, GameTextGet("$kummitus_wand_viewer_wand_depot_delete"), "")
+        end, RemoveWandCB, false, true)
+    end
 end

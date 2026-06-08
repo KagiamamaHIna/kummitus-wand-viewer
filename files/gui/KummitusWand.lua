@@ -1,11 +1,11 @@
 dofile_once("mods/kummitus_wand_viewer/files/libs/fn.lua")
 local DebugGame = DebugGetIsDevBuild()
-local KummitusPath
-if DebugGame then--获取文件路径，需要判断是否是debug游戏
-    KummitusPath = Cpp.CurrentPath().."/"
+if DebugGame then --获取文件路径，需要判断是否是debug游戏
+    KummitusPath = Cpp.CurrentPath() .. "/"
 else
     KummitusPath = SavePath
 end
+CurrentSavePath = KummitusPath
 KummitusPath = KummitusPath .. "save00/persistent/bones_new/"
 local t = Cpp.GetDirectoryPath(KummitusPath)--获取文件列表
 local WandXmlList = {}
