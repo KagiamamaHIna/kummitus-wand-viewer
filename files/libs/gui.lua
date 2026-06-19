@@ -87,10 +87,10 @@ end
 local checkboxFile = "mods/conjurer_reborn/files/unsafe/images/checkbox.png"
 local checkboxFillFile = "mods/conjurer_reborn/files/unsafe/images/checkbox_fill.png"
 local grey_1pxFile = "mods/conjurer_reborn/files/unsafe/images/grey_1px.png"
-local picker_close = "$conjurer_reborn_picker_close"
-local picker_open = "$conjurer_reborn_picker_open"
-local picker_desc = "$conjurer_reborn_picker_desc"
-local picker_more = "$conjurer_reborn_picker_more"
+local picker_close = "$kummitus_wand_viewer_picker_close"
+local picker_open = "$kummitus_wand_viewer_picker_open"
+local picker_desc = "$kummitus_wand_viewer_picker_desc"
+local picker_more = "$kummitus_wand_viewer_picker_more"
 
 local DefaultZDeep = -1250
 
